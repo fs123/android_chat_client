@@ -1,15 +1,24 @@
 package ch.fhnw.ws6.chat;
 
-public class ChatClient {
+import ch.fhnw.ws6.chat.actorsystem.ClientApplication;
+import ch.fhnw.ws6.chat.actorsystem.Consumer;
 
-    private String userName;
+public class ChatClient implements Consumer<String> {
 
-    public boolean login(String userName) {
-        this.userName = userName;
-        return true;
+    private Consumer<String> consumer;
+    private ClientApplication client = new ClientApplication("localhost", 14711, this);
+
+    public boolean login(String userName, Consumer<String> consumer) {
+        this.consumer = consumer;
+        return client.login(userName);
     }
 
     public void sendMessage(String message) {
+        client.sendMessage(message);
+    }
 
+    @Override
+    public void accept(String s) {
+        consumer.accept(s);
     }
 }

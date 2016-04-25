@@ -12,10 +12,14 @@ buildscript {
     }
 }
 
+apply plugin: 'java'
+
 allprojects {
     repositories {
         jcenter()
     }
+    sourceCompatibility = 1.7
+    targetCompatibility = 1.7
 }
 
 task clean(type: Delete) {
