@@ -45,6 +45,7 @@ public class ClientActor extends UntypedActor {
 			answerHandler.accept(((ChatMessageFromServer) message).from + ": " + ((ChatMessageFromServer) message).message);
 		} else if (message instanceof ChatMessageToServer) {
 			server.tell(message, self());
+			answerHandler.accept( "ICH: " + ((ChatMessageToServer) message).message);
 		} else {
 			unhandled(message);
 		}

@@ -1,5 +1,6 @@
 package ch.fhnw.ws6.chat.actorsystem;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import sadeghi.chat.events.ChatLoginRequest;
@@ -20,20 +21,24 @@ public class ClientApplication {
 	private ActorRef clientActor;
 	private String userName;
 	private Consumer<String> answerHandler;
-	private ActorSystem clientActorSystem;
+    private List<String> configs;
+    private ActorSystem clientActorSystem;
 
-	public ClientApplication(String hostName, int port, Consumer<String> answerHandler) {
+	public ClientApplication(String hostName, int port, Consumer<String> answerHandler, List<String> configs) {
 		this.serverHostName = hostName;
 		this.serverPort = port;
 		this.answerHandler = answerHandler;
-	}
+        this.configs = configs;
+    }
 
 	public boolean login(String userName) {
 		this.userName = userName;
-		Config clientConfig = ConfigFactory.parseString("akka.remote.netty.tcp.port = 0" )
-				.withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.hostname = " + serverHostName))
-				.withFallback(ConfigFactory.load("common"));
+		Config clientConfig = ConfigFactory.parseString("akka.remote.netty.tcp.port = 12345")
+				.withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.hostname = localhost"));
 
+        for (String config : configs) {
+            clientConfig = clientConfig.withFallback(ConfigFactory.parseString(config).resolve());
+        }
 		clientActorSystem = ActorSystem.create("clientActorSystem", clientConfig);
 		loginInboxActor = Inbox.create(clientActorSystem);
 		
@@ -62,7 +67,7 @@ public class ClientApplication {
 	}
 
 	public void stop() {
-//		clientActor.tell(PoisonPill.getInstance(), ActorRef.noSender());	
-		clientActorSystem.terminate();
+	//	clientActor.tell(PoisonPill.getInstance(), ActorRef.noSender());
+		//clientActorSystem.terminate();
 	}
 }
