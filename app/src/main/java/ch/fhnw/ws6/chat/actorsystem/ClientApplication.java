@@ -1,6 +1,7 @@
 package ch.fhnw.ws6.chat.actorsystem;
 
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import sadeghi.chat.events.ChatLoginRequest;
@@ -14,6 +15,7 @@ import akka.actor.Props;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+
 public class ClientApplication {
 	private String serverHostName;
 	private int serverPort;
@@ -33,7 +35,7 @@ public class ClientApplication {
 
 	public boolean login(String userName) {
 		this.userName = userName;
-		Config clientConfig = ConfigFactory.parseString("akka.remote.netty.tcp.port = 12345")
+		Config clientConfig = ConfigFactory.parseString("akka.remote.netty.tcp.port = " + (new Random().nextInt(10000) + 1024))
 				.withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.hostname = localhost"));
 
         for (String config : configs) {
@@ -50,7 +52,7 @@ public class ClientApplication {
 		try {
 			ChatLoginResponse response = (ChatLoginResponse) loginInboxActor.receive(Duration.create(2, TimeUnit.SECONDS));
 			if(!response.successful) {
-				answerHandler.accept("Ups, user already used...");
+				answerHandler.accept("Ups, user already used ...");
 				return false;
 			}
 		} catch (Exception e ) {
@@ -58,7 +60,7 @@ public class ClientApplication {
 			return false;
 		}
 		
-		answerHandler.accept("you are logged in, let's chat...:");
+		answerHandler.accept("Login successful, let's chat ... :)");
 		return true;
 	}
 	
@@ -67,7 +69,10 @@ public class ClientApplication {
 	}
 
 	public void stop() {
-	//	clientActor.tell(PoisonPill.getInstance(), ActorRef.noSender());
-		//clientActorSystem.terminate();
+		clientActorSystem.shutdown();
+	}
+
+	public void logout() {
+		loginInboxActor.send(clientActor, new ChatMessageToServer(userName, "/disconnect"));
 	}
 }

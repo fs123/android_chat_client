@@ -2,15 +2,15 @@ package ch.fhnw.ws6.chat.actorsystem;
 
 import java.util.concurrent.TimeUnit;
 
+import akka.actor.ActorSelection;
+import akka.actor.UntypedActor;
+import akka.pattern.Patterns;
+import akka.util.Timeout;
 import sadeghi.chat.events.ChatLoginRequest;
 import sadeghi.chat.events.ChatMessageFromServer;
 import sadeghi.chat.events.ChatMessageToServer;
 import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
-import akka.actor.ActorSelection;
-import akka.actor.UntypedActor;
-import akka.pattern.Patterns;
-import akka.util.Timeout;
 
 public class ClientActor extends UntypedActor {
 	private static String REMOTE_PATTERN = "akka.tcp://%s@%s:%d/user/serverActor";
@@ -51,12 +51,4 @@ public class ClientActor extends UntypedActor {
 		}
 	}
 
-	@Override
-	public void aroundPostStop() {
-		super.aroundPostStop();
-//		ChatMessage message = ChatMessage.createMessageSender(userName);
-//		message.setMessage("/disconnect");
-//		server.tell(message, getSelf());
-
-	}
 }
